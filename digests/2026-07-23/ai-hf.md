@@ -1,69 +1,66 @@
 # Hugging Face 热门模型日报 2026-07-23
 
-> 数据来源: [Hugging Face Hub](https://huggingface.co/) | 共 30 个模型 | 生成时间: 2026-07-23 01:45 UTC
+> 数据来源: [Hugging Face Hub](https://huggingface.co/) | 共 30 个模型 | 生成时间: 2026-07-23 13:37 UTC
 
 ---
 
-好的，作为 AI 模型生态分析师，以下是基于 2026-07-23 Hugging Face Hub 数据生成的热门模型日报。
+好的，作为AI模型生态分析师，以下是为您生成的《Hugging Face 热门模型日报》。
 
 ---
 
-## Hugging Face 热门模型日报 (2026-07-23)
+### **Hugging Face 热门模型日报 | 2026-07-23**
 
-### 今日速览
+#### **今日速览**
 
-本周 Hugging Face 生态由**多模态模型**和**极致量化**两大趋势主导。**百度**的 `Unlimited-OCR` 与 **Google** 的 `Gemma-4-31B-it` 展现了强大多模态能力的巨大吸引力，下载量分别突破百万和千万级别。与此同时，量化社区异常活跃，`prism-ml` 的 `1-bit` Bonsai 系列与 `empero-ai` 的 Qwythos 等作品证明了用户对高效、可本地部署模型的旺盛需求。此外，来自 **Moonshot AI** 和 **NVIDIA** 的代码、机器人及语音识别专用模型也表现抢眼，标志着模型生态正走向多元化和场景化。
+本周 Hugging Face 生态呈现多极化爆发态势。**百度**的 OCR 模型 `Unlimited-OCR` 以压倒性的下载量领跑，展示了实用型多模态模型的巨大需求。**MoE（混合专家）** 架构成为绝对主流，`zai-org/GLM-5.2` 和基于 Qwen3.6 的多个衍生模型包揽了热度前列。同时，**极端量化（1-bit、2-bit）** 和 **未审查（Uncensored）** 社区版本持续活跃，`prism-ml` 和 `DavidAU` 等团队贡献了大量高下载量模型。此外，**谷歌**的 `gemma-4-31B-it` 凭借强大的基础能力获得了极高的关注。
 
-### 热门模型
+#### **热门模型**
 
-#### 🧠 语言模型（LLM、对话模型、指令微调）
-
-| 模型 | 作者 | 点赞 | 下载 | 简要说明 |
-| :--- | :--- | ---: | ---: | :--- |
-| [zai-org/GLM-5.2](https://huggingface.co/zai-org/GLM-5.2) | zai-org | 4,337 | 545,109 | 本周点赞最高的文本生成模型，基于 MoE 架构的 GLM 系列最新版，在对话任务上表现出色。 |
-| [poolside/Laguna-S-2.1](https://huggingface.co/poolside/Laguna-S-2.1) | poolside | 394 | 3,056 | 基于 transformer 的文本生成模型，其衍生出的 GGUF 及 NVFP4 版本形成了小生态，有持续关注度。 |
-| [Motif-Technologies/Motif-3-Beta](https://huggingface.co/Motif-Technologies/Motif-3-Beta) | Motif-Technologies | 161 | 125 | 新晋模型家族 Motif 的第三个版本，专注于特征提取，目前处于早期发布阶段，值得关注其后续进展。 |
-
-#### 🎨 多模态与生成（图像、视频、音频、文本到X）
+##### 🧠 语言模型（LLM、对话模型、指令微调）
 
 | 模型 | 作者 | 点赞 | 下载 | 简要说明 |
 | :--- | :--- | ---: | ---: | :--- |
-| [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) | baidu | 2,714 | 2,237,351 | 百度发布的超强 OCR 模型，下载量高企，在图像文本识别任务上具备通用性和强鲁棒性。 |
-| [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it) | google | 3,328 | 12,113,203 | Google 最新的开源多模态模型，支持图像和文本输入，下载量超过1200万，生态影响力巨大。 |
-| [HauhauCS/Qwen3.6-35B-A3B-Uncensored...](https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive) | HauhauCS | 3,001 | 1,997,690 | 基于 Qwen3.6 的社区微调版，采用 MoE 和视觉能力，主打无审查，下载量和点赞数都很高。 |
-| [empero-ai/Qwythos-9B-Claude-Mythos...](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF) | empero-ai | 2,417 | 2,133,420 | 基于 Qwen3.5 的社区量化微调模型，支持推理能力，GGUF 格式使其在本地部署场景极受欢迎。 |
-| [microsoft/Mage-Flow](https://huggingface.co/microsoft/Mage-Flow) | microsoft | 124 | 0 | 微软发布的文本到图像生成模型，基于 diffusers 框架，代表了图像生成领域的最新探索。 |
-| [nvidia/Cosmos3-Edge](https://huggingface.co/nvidia/Cosmos3-Edge) | nvidia | 90 | 6,623 | NVIDIA Cosmos 世界模型系列的边缘计算版本，专注于为具身智能提供轻量化多模态理解能力。 |
-| [Alissonerdx/LTX-Best-Face-ID](https://huggingface.co/Alissonerdx/LTX-Best-Face-ID) | Alissonerdx | 235 | 0 | 用于文本到视频生成的 LoRA 模型，专注于身份保持，展示了视频生成领域的细分化定制趋势。 |
+| [zai-org/GLM-5.2](https://huggingface.co/zai-org/GLM-5.2) | zai-org | 4,354 | 596,442 | 本周关注度最高的基础模型之一，采用了 MoE-DSA 架构，在对话和文本生成任务上表现亮眼。 |
+| [google/gemma-4-31B-it](https://huggingface.co/google/gemma-4-31B-it) | google | 3,341 | 12,666,488 | 谷歌开源的 Gemma 4 系列指令微调版本，拥有庞大的用户基础，是当前最受欢迎的主流大模型之一。 |
+| [upstage/Solar-Open2-250B](https://huggingface.co/upstage/Solar-Open2-250B) | upstage | 387 | 362 | 参数规模达 250B 的巨型开源模型，代表了开源社区在超大模型领域的探索。 |
 
-#### 🔧 专用模型（代码、数学、医疗、嵌入）
+##### 🎨 多模态与生成（图像、视频、音频、文本到X）
 
 | 模型 | 作者 | 点赞 | 下载 | 简要说明 |
 | :--- | :--- | ---: | ---: | :--- |
-| [moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | moonshotai | 1,224 | 722,058 | Moonshot AI 开源的代码专用模型，支持多模态输入，采用压缩技术，在代码生成任务上具有强劲竞争力。 |
-| [openbmb/MiniCPM-RobotManip](https://huggingface.co/openbmb/MiniCPM-RobotManip) | openbmb | 154 | 58 | 面向机器人操作的视觉-语言-动作（VLA）模型，展示了语言大模型向物理世界交互延伸的探索。 |
-| [nvidia/nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b) | nvidia | 914 | 590,230 | NVIDIA 推出的流式语音识别模型，参数仅 0.6B，兼具高性能和高效率，非常适用于实时场景。 |
-| [ATH-MaaS/OvisOCR2](https://huggingface.co/ATH-MaaS/OvisOCR2) | ATH-MaaS | 249 | 17,162 | 基于 Qwen3.5 的 OCR 专用模型，在特定场景下可视为百度 Unlimited-OCR 的轻量级备选方案。 |
-| [OpenMOSS-Team/MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize) | OpenMOSS-Team | 308 | 92,265 | 专注于语音转录和说话人分离的音频文本模型，填补了开源生态中此类专用模型的空白。 |
+| [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) | baidu | 2,823 | 2,414,259 | 百度的通用 OCR 模型，下载量惊人，证明了其在图像文字识别场景中的强大实用价值。 |
+| [HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive](https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive) | HauhauCS | 3,020 | 2,027,080 | 基于 Qwen3.6 的 MoE 视觉语言模型，具有“未审查”和“激进”特性，社区关注度极高。 |
+| [empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF) | empero-ai | 2,430 | 2,126,755 | 一款强调推理能力的多模态 GGUF 模型，结合了 Qwen3.5 与 Mythos 数据集，下载量巨大。 |
+| [OpenMOSS-Team/MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize) | OpenMOSS-Team | 317 | 111,598 | 专注于音频文字转录与说话人分离（Diarization）的专用模型，填补了音频任务的热门需求。 |
+| [nvidia/Cosmos3-Edge](https://huggingface.co/nvidia/Cosmos3-Edge) | nvidia | 93 | 28,493 | 英伟达推出的 Cosmos 系列边缘端模型，专注于轻量级图像生成。 |
 
-#### 📦 微调与量化（社区微调、GGUF、AWQ）
+##### 🔧 专用模型（代码、数学、医疗、嵌入）
 
 | 模型 | 作者 | 点赞 | 下载 | 简要说明 |
 | :--- | :--- | ---: | ---: | :--- |
-| [prism-ml/Bonsai-27B-gguf](https://huggingface.co/prism-ml/Bonsai-27B-gguf) | prism-ml | 596 | 1,404,962 | 极致量化的代表，将 27B 模型压缩至 1-bit，下载量超140万，引发社区对于极低比特模型潜力的广泛讨论。 |
-| [prism-ml/Ternary-Bonsai-27B-gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf) | prism-ml | 945 | 432,196 | Bonsai 系列的三元量化版本（2-bit），在模型大小与性能间取得新的平衡点，受到社区欢迎。 |
-| [DavidAU/Qwen3.6-27B-Fable-Fusion...](https://huggingface.co/DavidAU/Qwen3.6-27B-Fable-Fusion-711-Uncensored-Heretic-NM-DAU-NEO-MAX-MTP-GGUF) | DavidAU | 321 | 62,842 | 基于 Qwen3.6 的社区高阶微调模型，通过大量微调融合技术，主打无审查和高性能。 |
-| [unsloth/Laguna-S-2.1-GGUF](https://huggingface.co/unsloth/Laguna-S-2.1-GGUF) | unsloth | 108 | 0 | 知名微调工具团队 unsloth 提供的 Laguna 模型量化版本，保证了高效部署的便捷性。 |
+| [moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code) | moonshotai | 1,237 | 766,522 | 月之暗面推出的代码专用模型，采用压缩张量技术，在代码生成领域表现突出。 |
+| [nvidia/nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b) | nvidia | 923 | 750,118 | 英伟达流式语音识别模型，参数仅 0.6B，适合实时语音转写场景。 |
+| [nvidia/Cosmos3-Edge](https://huggingface.co/nvidia/Cosmos3-Edge) | nvidia | 93 | 28,493 | 属于文本到图像（text-to-image）的专用模型，采用 Diffusers 框架。 |
 
-### 生态信号
+##### 📦 微调与量化（社区微调、GGUF、AWQ）
 
-本周生态呈现**头部聚集**与**长尾创新**并存的格局。**多模态**是绝对主线：Google 的 Gemma-4 和百度 Unlimited-OCR 证明，高质量开源多模态模型能迅速聚拢巨大流量。同时，以 **Qwen3.5/3.6** 和 **GLM** 为代表的模型家族，已成为社区二创和微调的核心基座，生态势能强劲。在部署侧，`prism-ml` 的 **1-bit / 2-bit** 量化实验引发广泛关注，标志着“模型瘦身”进入全新前沿，用户对可在本地设备运行的极致高效模型需求迫切。此外，如 **MiniCPM** 的机器人模型和 **NVIDIA** 的流式 ASR，预示着垂直场景的专用模型正成为开源社区新的增长点。
+| 模型 | 作者 | 点赞 | 下载 | 简要说明 |
+| :--- | :--- | ---: | ---: | :--- |
+| [prism-ml/Ternary-Bonsai-27B-gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf) | prism-ml | 967 | 576,083 | 采用极端的“三进制（2-bit）”量化技术，在极低比特下实现了 27B 模型的运行，引发了社区对量化极限的讨论。 |
+| [prism-ml/Bonsai-27B-gguf](https://huggingface.co/prism-ml/Bonsai-27B-gguf) | prism-ml | 610 | 1,910,116 | 采用 1-bit 量化的 Bonsai 模型，下载量巨大，体现了社区对极致轻量化模型的热衷。 |
+| [DavidAU/Qwen3.6-27B-Fable-Fusion-711...](https://huggingface.co/DavidAU/Qwen3.6-27B-Fable-Fusion-711-Uncensored-Heretic-NM-DAU-NEO-MAX-MTP-GGUF) | DavidAU | 370 | 334,847 | 社区微调模型的典型代表，对 Qwen3.6 进行了大量自定义微调，主打“未审查”风格。 |
+| [thinkingmachines/Inkling](https://huggingface.co/thinkingmachines/Inkling) | thinkingmachines | 1,486 | 24,669 | 一个全新的多模态对话模型，上线首周即获得高赞，展示了社区对新架构的渴望。 |
+| [conradlocke/krea2-identity-edit](https://huggingface.co/conradlocke/krea2-identity-edit) | conradlocke | 510 | 0 | 基于 Krea-2 的身份编辑 LoRA，虽然下载量为 0，但点赞数高，说明其在图像编辑细分领域具备潜在影响力。 |
 
-### 值得探索
+#### **生态信号**
 
-1.  **`prism-ml/Bonsai-27B-gguf`**: 这款 1-bit 量化模型值得深入研究。它不仅能让你在消费级硬件上运行一个 27B 模型，更是探索“模型压缩极限”和“极低精度推理”的绝佳实验平台，其实际能力与性能的 trade-off 非常值得分析。
-2.  **`baidu/Unlimited-OCR`**: 对于任何涉及图像中文字提取（如文档数字化、票据识别、场景文字理解）的场景，这是本日无可争议的首选。其超高的下载量和百度背书，意味着它是一个经过大规模验证的、可直接应用于生产的解决方案。
-3.  **`openbmb/MiniCPM-RobotManip` 与 `MiniCPM-RobotTrack`**: 这两个模型是“具身智能”浪潮在开源社区的早期产物。如果你对 AI 与物理世界交互感兴趣，这组模型是研究如何将 VLM 能力迁移到机器人控制任务的绝佳起点，代表了未来智能体的发展方向之一。
+本周生态呈现三个显著信号：**第一，MoE 与 Qwen 家族统治力极强**。从原始模型（如 GLM-5.2）到大量社区微调版（如 Qwen3.6 系列），MoE 架构已成为主流，且 Qwen 系列成为了最受欢迎的基座。**第二，量化技术走向极端**。1-bit 和 2-bit 的 `Bonsai` 模型系列获得了海量下载，表明社区对个人设备上运行大模型的渴望促使量化技术不断突破极限。**第三，“Uncensored” 文化持续发酵**。多个高赞的 GGUF 模型都明确标注了 “Uncensored”（未审查）或类似标签，反映了开源社区对高自由度内容生成的追求，但也值得关注其潜在的合规风险。
+
+#### **值得探索**
+
+1.  **[zai-org/GLM-5.2](https://huggingface.co/zai-org/GLM-5.2)**：作为本周热度最高的基础模型，建议深入评估其 MoE-DSA 架构的实际性能表现，它可能代表了下一代高效 MoE 的方向。
+2.  **[prism-ml/Ternary-Bonsai-27B-gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf)**：这是一个极具实验性质的模型，探索了 27B 模型在极端 2-bit 量化下的效果。对于关注模型压缩和边缘计算的开发者来说，是必须研究的对象。
+3.  **[moonshotai/Kimi-K2.7-Code](https://huggingface.co/moonshotai/Kimi-K2.7-Code)**：作为国内头部大模型公司开源的代码专用模型，其采用“压缩张量”技术，在效率和能力之间取得了平衡，值得开发者测试其在代码生成任务上的实际表现。
 
 ---
-*本日报由 [agents-radar](https://github.com/duanyytop/agents-radar) 自动生成。*
+*本日报由 [agents-radar](https://github.com/zhoukeke99/agents-radar) 自动生成。*
