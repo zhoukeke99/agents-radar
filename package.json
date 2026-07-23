@@ -5,6 +5,8 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "start": "tsx src/index.ts",
+    "start:lite": "RADAR_MODE=lite tsx src/index.ts",
+    "core-demo": "tsx scripts/radar-core-demo.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",

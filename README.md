@@ -220,12 +220,13 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `LLM_PROVIDER` | optional | `anthropic` (default), `openai`, `github-copilot`, or `openrouter` |
+| `LLM_PROVIDER` | optional | `anthropic` (default), `openai`, `github-copilot`, `openrouter`, or `deepseek` |
 | `ANTHROPIC_API_KEY` | if Anthropic | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | API endpoint override. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
 | `OPENAI_API_KEY` | if OpenAI | OpenAI API key |
 | `OPENAI_BASE_URL` | optional | OpenAI endpoint override |
 | `OPENROUTER_API_KEY` | if OpenRouter | OpenRouter API key |
+| `DEEPSEEK_API_KEY` | if DeepSeek | DeepSeek API key |
 | `TELEGRAM_BOT_TOKEN` | optional | Telegram bot token from [@BotFather](https://t.me/BotFather). If set, a message is sent after each digest run |
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 | `FEISHU_WEBHOOK_URLS` | optional | Comma-separated Feishu custom bot webhook URLs. If set, a card message is sent to each group after each digest run |
@@ -258,8 +259,9 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | GitHub Copilot | `github-copilot` | `GITHUB_TOKEN` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
+| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-chat` |
 
-Override the model name with `ANTHROPIC_MODEL`, `OPENAI_MODEL`, `GITHUB_COPILOT_MODEL`, or `OPENROUTER_MODEL` respectively.
+Override the model name with `ANTHROPIC_MODEL`, `OPENAI_MODEL`, `GITHUB_COPILOT_MODEL`, `OPENROUTER_MODEL`, or `DEEPSEEK_MODEL` respectively.
 
 The provider abstraction lives in `src/providers/` — each provider is a separate file implementing the `LlmProvider` interface. Adding a new provider only requires creating a new file and registering it in the factory.
 
@@ -268,26 +270,57 @@ The provider abstraction lives in `src/providers/` — each provider is a separa
 ```bash
 pnpm install
 
-export GITHUB_TOKEN=ghp_xxxxx
+cp .env.example .env
+# Edit .env and fill GITHUB_TOKEN plus the API key for your chosen LLM provider.
+
+pnpm start
+```
+
+You can also run with temporary environment variables:
+
+```bash
+export GITHUB_TOKEN=XXX
 
 # Option A: Anthropic (default)
-export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
+export ANTHROPIC_API_KEY=XXX
 
 # Option B: OpenAI
 # export LLM_PROVIDER=openai
-# export OPENAI_API_KEY=sk-xxxxxxxx
+# export OPENAI_API_KEY=XXX
 
 # Option C: GitHub Copilot (uses GITHUB_TOKEN)
 # export LLM_PROVIDER=github-copilot
 
 # Option D: OpenRouter
 # export LLM_PROVIDER=openrouter
-# export OPENROUTER_API_KEY=sk-or-xxxxxxxx
+# export OPENROUTER_API_KEY=XXX
+
+# Option E: DeepSeek
+# export LLM_PROVIDER=deepseek
+# export DEEPSEEK_API_KEY=XXX
 
 export DIGEST_REPO=your-username/agents-radar  # optional; omit to only write files
 
 pnpm start
 ```
+
+Lower-cost local runs:
+
+```bash
+# Chinese-only CLI / Trending / HN reports; skips bilingual output, OpenClaw, web, papers, community, and highlights.
+pnpm start:lite
+
+# No-LLM core demo: fetch 30 links, dedupe, score, and generate 5 recommendations.
+pnpm core-demo
+```
+
+Runtime options:
+
+| Variable | Description |
+|----------|-------------|
+| `RADAR_MODE=lite` | Lower-cost mode; defaults to `RADAR_LANGS=zh` and `RADAR_REPORTS=cli,trending,hn` |
+| `RADAR_LANGS=zh` / `en` / `both` | Controls generated languages |
+| `RADAR_REPORTS=cli,trending,hn` | Controls report types; supports `all` or comma-separated `cli,agents,web,trending,hn,ph,arxiv,hf,community,highlights` |
 
 ## Output format
 

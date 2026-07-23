@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { runMonthlyRollup } from "./rollup.ts";
 
 runMonthlyRollup().catch((err) => {
