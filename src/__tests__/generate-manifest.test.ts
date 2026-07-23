@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toRfc822, escapeXml } from "../generate-manifest.ts";
+import { toRfc822, escapeXml, getReportFiles, getSiteUrl } from "../generate-manifest.ts";
 
 // ---------------------------------------------------------------------------
 // toRfc822
@@ -60,5 +60,51 @@ describe("escapeXml", () => {
 
   it("handles empty string", () => {
     expect(escapeXml("")).toBe("");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getSiteUrl
+// ---------------------------------------------------------------------------
+
+describe("getSiteUrl", () => {
+  it("uses configured Pages URL and trims trailing slash", () => {
+    expect(getSiteUrl({ PAGES_URL: "https://example.com/repo/" })).toBe("https://example.com/repo");
+  });
+
+  it("falls back when Pages URL is empty", () => {
+    expect(getSiteUrl({ PAGES_URL: "" })).toBe("https://duanyytop.github.io/agents-radar");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getReportFiles
+// ---------------------------------------------------------------------------
+
+describe("getReportFiles", () => {
+  it("filters to Chinese reports and selected daily report types", () => {
+    const files = getReportFiles({
+      RADAR_MODE: "lite",
+      RADAR_LANGS: "zh",
+      RADAR_REPORTS: "cli,trending,hn,arxiv,hf,community",
+    });
+
+    expect(files).toEqual([
+      "ai-cli",
+      "ai-trending",
+      "ai-hn",
+      "ai-arxiv",
+      "ai-hf",
+      "ai-community",
+      "ai-weekly",
+      "ai-monthly",
+    ]);
+  });
+
+  it("keeps bilingual output by default", () => {
+    const files = getReportFiles({});
+
+    expect(files).toContain("ai-cli");
+    expect(files).toContain("ai-cli-en");
   });
 });

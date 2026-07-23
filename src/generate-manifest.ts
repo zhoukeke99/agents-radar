@@ -2,36 +2,26 @@ import fs from "fs";
 import path from "path";
 import { marked } from "marked";
 import { REPORT_LABELS } from "./i18n.ts";
+import { getRunOptions, type ReportId } from "./run-options.ts";
 
 const DIGESTS_DIR = "digests";
 const MANIFEST_PATH = "manifest.json";
 const FEED_PATH = "feed.xml";
-const SITE_URL = "https://duanyytop.github.io/agents-radar";
+const SITE_URL_DEFAULT = "https://duanyytop.github.io/agents-radar";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const REPORT_FILES = [
-  "ai-cli",
-  "ai-cli-en",
-  "ai-agents",
-  "ai-agents-en",
-  "ai-web",
-  "ai-web-en",
-  "ai-trending",
-  "ai-trending-en",
-  "ai-hn",
-  "ai-hn-en",
-  "ai-ph",
-  "ai-ph-en",
-  "ai-arxiv",
-  "ai-arxiv-en",
-  "ai-hf",
-  "ai-hf-en",
-  "ai-community",
-  "ai-community-en",
-  "ai-weekly",
-  "ai-weekly-en",
-  "ai-monthly",
-  "ai-monthly-en",
-] as const;
+const REPORT_FILE_GROUPS: Array<{ id: ReportId | "weekly" | "monthly"; zh: string; en: string }> = [
+  { id: "cli", zh: "ai-cli", en: "ai-cli-en" },
+  { id: "agents", zh: "ai-agents", en: "ai-agents-en" },
+  { id: "web", zh: "ai-web", en: "ai-web-en" },
+  { id: "trending", zh: "ai-trending", en: "ai-trending-en" },
+  { id: "hn", zh: "ai-hn", en: "ai-hn-en" },
+  { id: "ph", zh: "ai-ph", en: "ai-ph-en" },
+  { id: "arxiv", zh: "ai-arxiv", en: "ai-arxiv-en" },
+  { id: "hf", zh: "ai-hf", en: "ai-hf-en" },
+  { id: "community", zh: "ai-community", en: "ai-community-en" },
+  { id: "weekly", zh: "ai-weekly", en: "ai-weekly-en" },
+  { id: "monthly", zh: "ai-monthly", en: "ai-monthly-en" },
+];
 const MAX_FEED_ITEMS = 30;
 
 interface DateEntry {
@@ -62,6 +52,25 @@ export function toRfc822(date: Date): string {
 
 export function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+export function getSiteUrl(env: NodeJS.ProcessEnv = process.env): string {
+  return (env["PAGES_URL"] || SITE_URL_DEFAULT).replace(/\/$/, "");
+}
+
+export function getReportFiles(env: NodeJS.ProcessEnv = process.env): string[] {
+  const options = getRunOptions(env);
+  const enabledReports = new Set<string>(options.reports);
+  const includeZh = options.langs.includes("zh");
+  const includeEn = options.langs.includes("en");
+
+  return REPORT_FILE_GROUPS.flatMap((group) => {
+    if (group.id !== "weekly" && group.id !== "monthly" && !enabledReports.has(group.id)) return [];
+    const files: string[] = [];
+    if (includeZh) files.push(group.zh);
+    if (includeEn) files.push(group.en);
+    return files;
+  });
 }
 
 async function getReportContent(date: string, report: string): Promise<ReportContent> {
@@ -97,13 +106,15 @@ async function getReportContent(date: string, report: string): Promise<ReportCon
 }
 
 async function main(): Promise<void> {
+  const reportFiles = getReportFiles();
+  const siteUrl = getSiteUrl();
   const entries = fs
     .readdirSync(DIGESTS_DIR)
     .filter((name) => DATE_RE.test(name) && fs.statSync(path.join(DIGESTS_DIR, name)).isDirectory())
     .sort()
     .reverse()
     .map((date) => {
-      const reports = REPORT_FILES.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
+      const reports = reportFiles.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
       return { date, reports };
     })
     .filter((e) => e.reports.length > 0);
@@ -132,7 +143,7 @@ async function main(): Promise<void> {
   for (const { date, report } of feedItems) {
     const label = REPORT_LABELS[report] ?? report;
     const title = `${label} ${date}`;
-    const link = `${SITE_URL}/#${date}/${report}`;
+    const link = `${siteUrl}/#${date}/${report}`;
     const parts = date.split("-").map(Number);
     const pubDate = toRfc822(new Date(Date.UTC(parts[0]!, parts[1]! - 1, parts[2]!)));
     const content = await getReportContent(date, report);
@@ -156,10 +167,10 @@ async function main(): Promise<void> {
     `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n` +
     `  <channel>\n` +
     `    <title>agents-radar</title>\n` +
-    `    <link>${SITE_URL}</link>\n` +
-    `    <description>AI 开源生态每日简报 · Daily AI ecosystem digest</description>\n` +
+    `    <link>${siteUrl}</link>\n` +
+    `    <description>AI 开源生态每日简报</description>\n` +
     `    <language>zh-CN</language>\n` +
-    `    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>\n` +
+    `    <atom:link href="${siteUrl}/feed.xml" rel="self" type="application/rss+xml"/>\n` +
     `    <lastBuildDate>${buildDate}</lastBuildDate>\n` +
     itemsXml +
     `\n  </channel>\n` +

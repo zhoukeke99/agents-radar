@@ -15,6 +15,7 @@ import {
 import { createGitHubIssue } from "./github.ts";
 import { toCstDateStr, toUtcStr } from "./date.ts";
 import { type Lang, WEEKLY_REPORT, MONTHLY_REPORT } from "./i18n.ts";
+import { getRunOptions } from "./run-options.ts";
 
 const DIGESTS_DIR = "digests";
 const MAX_CHARS_PER_REPORT = 2500;
@@ -72,8 +73,7 @@ export function toWeekStr(date: Date): string {
 // ---------------------------------------------------------------------------
 
 async function generateRollupHighlights(
-  zhContent: string,
-  enContent: string,
+  contents: Partial<Record<Lang, string>>,
   reportId: string,
   dateStr: string,
   itemsPerReport: number,
@@ -96,22 +96,21 @@ async function generateRollupHighlights(
     en: { ...existing.en },
   };
 
-  // zh and en are parsed independently so a failure in one language doesn't
-  // wipe the other.
-  const [zhRes, enRes] = await Promise.allSettled([
-    callLlm(buildHighlightsPrompt({ [reportId]: zhContent }, "zh", itemsPerReport), 1024),
-    callLlm(buildHighlightsPrompt({ [reportId]: enContent }, "en", itemsPerReport), 1024),
-  ]);
-  for (const [lang, res] of [
-    ["zh", zhRes],
-    ["en", enRes],
-  ] as const) {
+  const results = await Promise.allSettled(
+    (Object.entries(contents) as Array<[Lang, string]>).map(async ([lang, content]) => ({
+      lang,
+      value: await callLlm(buildHighlightsPrompt({ [reportId]: content }, lang, itemsPerReport), 1024),
+    })),
+  );
+
+  for (const res of results) {
     if (res.status !== "fulfilled") {
-      console.error(`  [${reportId}] ${lang} highlights generation failed: ${res.reason}`);
+      console.error(`  [${reportId}] highlights generation failed: ${res.reason}`);
       continue;
     }
+    const { lang, value } = res.value;
     try {
-      Object.assign(highlights[lang], parseLlmJson<ReportHighlights>(res.value));
+      Object.assign(highlights[lang], parseLlmJson<ReportHighlights>(value));
     } catch (err) {
       console.error(`  [${reportId}] ${lang} highlights parse failed: ${err}`);
     }
@@ -130,8 +129,9 @@ export async function runWeeklyRollup(): Promise<void> {
   const utcStr = toUtcStr(now);
   const weekStr = toWeekStr(new Date(now.getTime() + 8 * 60 * 60 * 1000));
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
+  const langs = getRunOptions().langs;
 
-  console.log(`[weekly] Generating rollup for ${weekStr} (date: ${dateStr})`);
+  console.log(`[weekly] Generating rollup for ${weekStr} (date: ${dateStr}, langs: ${langs.join(",")})`);
 
   // Collect last 7 days of daily digests
   const allDates = getDateDirs();
@@ -152,37 +152,34 @@ export async function runWeeklyRollup(): Promise<void> {
     `[weekly] Found ${Object.keys(dailyDigests).length} daily digests: ${Object.keys(dailyDigests).join(", ")}`,
   );
 
-  // Generate ZH and EN in parallel
-  console.log("[weekly] Calling LLM for ZH and EN weekly reports in parallel...");
-  const [zhSummary, enSummary] = await Promise.all([
-    callLlm(buildWeeklyPrompt(dailyDigests, weekStr, "zh"), LLM_TOKENS_ROLLUP),
-    callLlm(buildWeeklyPrompt(dailyDigests, weekStr, "en"), LLM_TOKENS_ROLLUP),
-  ]);
+  console.log(`[weekly] Calling LLM for ${langs.join(" + ")} weekly report(s)...`);
+  const summaryEntries = await Promise.all(
+    langs.map(
+      async (lang) =>
+        [lang, await callLlm(buildWeeklyPrompt(dailyDigests, weekStr, lang), LLM_TOKENS_ROLLUP)] as const,
+    ),
+  );
 
-  const footer = autoGenFooter("zh");
-  const enFooter = autoGenFooter("en");
+  const contents: Partial<Record<Lang, string>> = {};
+  for (const [lang, summary] of summaryEntries) {
+    const suffix = lang === "en" ? "-en" : "";
+    const title = WEEKLY_REPORT.title[lang];
+    const coverage = WEEKLY_REPORT.coverage[lang];
+    const generated = lang === "en" ? "Generated" : "生成时间";
+    const content =
+      `# ${title} ${weekStr}\n\n` +
+      `> ${coverage}: ${last7[last7.length - 1]} ~ ${last7[0]} | ${generated}: ${utcStr} UTC\n\n` +
+      `---\n\n` +
+      summary +
+      autoGenFooter(lang);
+    contents[lang] = content;
+    console.log(`  Saved ${saveFile(content, dateStr, `ai-weekly${suffix}.md`)}`);
+  }
 
-  const zhContent =
-    `# ${WEEKLY_REPORT.title.zh} ${weekStr}\n\n` +
-    `> ${WEEKLY_REPORT.coverage.zh}: ${last7[last7.length - 1]} ~ ${last7[0]} | 生成时间: ${utcStr} UTC\n\n` +
-    `---\n\n` +
-    zhSummary +
-    footer;
+  await generateRollupHighlights(contents, "ai-weekly", dateStr, 6);
 
-  const enContent =
-    `# ${WEEKLY_REPORT.title.en} ${weekStr}\n\n` +
-    `> ${WEEKLY_REPORT.coverage.en}: ${last7[last7.length - 1]} ~ ${last7[0]} | Generated: ${utcStr} UTC\n\n` +
-    `---\n\n` +
-    enSummary +
-    enFooter;
-
-  console.log(`  Saved ${saveFile(zhContent, dateStr, "ai-weekly.md")}`);
-  console.log(`  Saved ${saveFile(enContent, dateStr, "ai-weekly-en.md")}`);
-
-  await generateRollupHighlights(zhContent, enContent, "ai-weekly", dateStr, 6);
-
-  if (digestRepo) {
-    const url = await createGitHubIssue(WEEKLY_REPORT.issueTitle(weekStr), zhContent, "weekly");
+  if (digestRepo && contents.zh) {
+    const url = await createGitHubIssue(WEEKLY_REPORT.issueTitle(weekStr), contents.zh, "weekly");
     console.log(`  Created weekly issue: ${url}`);
   }
 
@@ -202,8 +199,9 @@ export async function runMonthlyRollup(): Promise<void> {
   const dateStr = toCstDateStr(now);
   const utcStr = toUtcStr(now);
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
+  const langs = getRunOptions().langs;
 
-  console.log(`[monthly] Generating rollup for ${monthStr} (date: ${dateStr})`);
+  console.log(`[monthly] Generating rollup for ${monthStr} (date: ${dateStr}, langs: ${langs.join(",")})`);
 
   const allDates = getDateDirs();
 
@@ -246,37 +244,33 @@ export async function runMonthlyRollup(): Promise<void> {
 
   console.log(`[monthly] Source: ${sourceLabel.zh}`);
 
-  // Generate ZH and EN in parallel
-  console.log("[monthly] Calling LLM for ZH and EN monthly reports in parallel...");
-  const [zhSummary, enSummary] = await Promise.all([
-    callLlm(buildMonthlyPrompt(sourceDigests, monthStr, "zh"), LLM_TOKENS_ROLLUP),
-    callLlm(buildMonthlyPrompt(sourceDigests, monthStr, "en"), LLM_TOKENS_ROLLUP),
-  ]);
+  console.log(`[monthly] Calling LLM for ${langs.join(" + ")} monthly report(s)...`);
+  const summaryEntries = await Promise.all(
+    langs.map(
+      async (lang) =>
+        [lang, await callLlm(buildMonthlyPrompt(sourceDigests, monthStr, lang), LLM_TOKENS_ROLLUP)] as const,
+    ),
+  );
 
-  const footer = autoGenFooter("zh");
-  const enFooter = autoGenFooter("en");
+  const contents: Partial<Record<Lang, string>> = {};
+  for (const [lang, summary] of summaryEntries) {
+    const suffix = lang === "en" ? "-en" : "";
+    const sourceText = lang === "en" ? `Sources: ${sourceLabel.en}` : `数据来源: ${sourceLabel.zh}`;
+    const generated = lang === "en" ? "Generated" : "生成时间";
+    const content =
+      `# ${MONTHLY_REPORT.title[lang]} ${monthStr}\n\n` +
+      `> ${sourceText} | ${generated}: ${utcStr} UTC\n\n` +
+      `---\n\n` +
+      summary +
+      autoGenFooter(lang);
+    contents[lang] = content;
+    console.log(`  Saved ${saveFile(content, dateStr, `ai-monthly${suffix}.md`)}`);
+  }
 
-  const zhContent =
-    `# ${MONTHLY_REPORT.title.zh} ${monthStr}\n\n` +
-    `> 数据来源: ${sourceLabel.zh} | 生成时间: ${utcStr} UTC\n\n` +
-    `---\n\n` +
-    zhSummary +
-    footer;
+  await generateRollupHighlights(contents, "ai-monthly", dateStr, 6);
 
-  const enContent =
-    `# ${MONTHLY_REPORT.title.en} ${monthStr}\n\n` +
-    `> Sources: ${sourceLabel.en} | Generated: ${utcStr} UTC\n\n` +
-    `---\n\n` +
-    enSummary +
-    enFooter;
-
-  console.log(`  Saved ${saveFile(zhContent, dateStr, "ai-monthly.md")}`);
-  console.log(`  Saved ${saveFile(enContent, dateStr, "ai-monthly-en.md")}`);
-
-  await generateRollupHighlights(zhContent, enContent, "ai-monthly", dateStr, 6);
-
-  if (digestRepo) {
-    const url = await createGitHubIssue(MONTHLY_REPORT.issueTitle(monthStr), zhContent, "monthly");
+  if (digestRepo && contents.zh) {
+    const url = await createGitHubIssue(MONTHLY_REPORT.issueTitle(monthStr), contents.zh, "monthly");
     console.log(`  Created monthly issue: ${url}`);
   }
 

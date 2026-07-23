@@ -52,7 +52,7 @@ export function buildMessage(
   pagesUrl?: string,
   highlights?: Highlights | null,
 ): string {
-  const PAGES_URL = (pagesUrl ?? process.env["PAGES_URL"] ?? PAGES_URL_DEFAULT).replace(/\/$/, "");
+  const PAGES_URL = (pagesUrl || process.env["PAGES_URL"] || PAGES_URL_DEFAULT).replace(/\/$/, "");
   const baseReports = reports.filter((r) => !r.endsWith("-en"));
   const isWeekly = baseReports.includes("ai-weekly");
   const isMonthly = baseReports.includes("ai-monthly");

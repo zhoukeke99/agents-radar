@@ -60,6 +60,11 @@ jobs:
           fi
 
       - name: Update web manifest
+        env:
+          PAGES_URL: ${{ vars.PAGES_URL }}
+          RADAR_MODE: ${{ vars.RADAR_MODE }}
+          RADAR_LANGS: ${{ vars.RADAR_LANGS }}
+          RADAR_REPORTS: ${{ vars.RADAR_REPORTS }}
         run: pnpm manifest
 
       - name: Commit manifest and feed
@@ -75,13 +80,13 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '@agents_radar' }}
-          PAGES_URL: https://duanyytop.github.io/agents-radar
+          PAGES_URL: ${{ vars.PAGES_URL }}
         run: pnpm notify
 
       - name: Send Feishu notification
         env:
           FEISHU_WEBHOOK_URLS: ${{ secrets.FEISHU_WEBHOOK_URLS }}
-          PAGES_URL: https://duanyytop.github.io/agents-radar
+          PAGES_URL: ${{ vars.PAGES_URL }}
         run: pnpm notify:feishu
 
       - name: Close stale issues
